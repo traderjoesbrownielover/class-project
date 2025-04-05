@@ -15,7 +15,7 @@ function App() {
 
   const runCode = async () => {
     try {
-      const response = await fetch("https://api.render.com/deploy/srv-cvopc0ngi27c73asqd90?key=ApGqvq-EBYY", {
+      const response = await fetch("https://class-project-fwoz.onrender.com/run", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ language, code: userCode, tests: testCases }),
