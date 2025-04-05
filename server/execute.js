@@ -89,4 +89,10 @@ Actual Output: False
   });
 });
 
+
+app.post("/run", async (req, res) => {
+  req.url = "/execute";
+  app._router.handle(req, res);
+});
+
 app.listen(5002, () => console.log("Server running on port 5002"));
