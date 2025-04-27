@@ -4,12 +4,14 @@ const { exec } = require("child_process");
 const fs = require("fs");
 const axios = require("axios");
 require("dotenv").config();
+
 console.log("Loaded API key (shortened):", process.env.OPENAI_API_KEY?.slice(0, 5));
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Helper to call OpenAI API for feedback
 const generateFeedback = async (prompt) => {
   try {
     const response = await axios.post(
@@ -34,13 +36,16 @@ const generateFeedback = async (prompt) => {
   }
 };
 
+// MAIN EXECUTION ROUTE
 app.post("/execute", async (req, res) => {
-  const { code, tests } = req.body;
+  const { code, tests, functionName } = req.body;  // <-- Now receiving functionName
   const fileName = "solution.py";
 
   let feedback = "";
+
+  // Build code file dynamically
   const codeWithTests = code + "\n\n" + tests.map((t, i) =>
-    `print("TEST_CASE_${i}", isPalindrome("${t.input}") == ${t.expected})`
+    `print("TEST_CASE_${i}", ${functionName}(${t.input}) == ${t.expected})`
   ).join("\n");
 
   fs.writeFileSync(fileName, codeWithTests);
@@ -89,7 +94,7 @@ Actual Output: False
   });
 });
 
-
+// Simple reroute /run -> /execute
 app.post("/run", async (req, res) => {
   req.url = "/execute";
   app._router.handle(req, res);
